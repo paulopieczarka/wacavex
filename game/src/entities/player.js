@@ -13,21 +13,15 @@ class Player extends EntityAlive {
   }
 
   // @Override
-  get posX () { return this.x }
-
-  // @Override
-  get posY () { return this.y }
-
-  // @Override
   update (keyboard, delta) {
     super.update(keyboard, delta)
 
     if (keyboard.isKeyDown('w')) {
-      this.moveForward(1)
+      this.moveForward(0.05)
     }
 
     if (keyboard.isKeyDown('s')) {
-      this.moveBackward(1)
+      this.moveBackward(0.05)
     }
 
     if (keyboard.isKeyDown('a')) {
@@ -41,7 +35,7 @@ class Player extends EntityAlive {
 
   // @Override
   maxSpeed () {
-    return 5.7
+    return 3.7
   }  
 }
 

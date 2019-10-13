@@ -1,3 +1,5 @@
+import Camera from '../camera'
+
 class Entity {
   constructor ({ name, x, y, width, height, color }) {
     this.name = name
@@ -23,11 +25,11 @@ class Entity {
   update (keyboard, delta) { }
 
   get posX () {
-    return this.x
+    return this.x + Camera.x
   }
 
   get posY () {
-    return this.y
+    return this.y + Camera.y
   }
 
   isAlive () {

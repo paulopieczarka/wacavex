@@ -1,13 +1,15 @@
+import Color from '../util/color'
+
 class Tile {
   static list = Array()
-  static SaltWater = new Tile(0, 'Salt Water', 'blue', { isWater: true })
-  static Grass = new Tile(1, 'Grass', 'green')
-  static Sand = new Tile(2, 'Sand', 'green')
+  static SaltWater = new Tile(0, 'Salt Water', Color.fromHex('#5199FF'), { isWater: true })
+  static Grass = new Tile(1, 'Grass', Color.fromHex('#00FF00'))
+  static Sand = new Tile(2, 'Sand', Color.fromHex('#FFFF00'))
 
   constructor (id, name, color, { isSolid, isWater } = {}) {
     this.id = id
     this.name = name
-    this.color = color || 'hotpink'
+    this.color = color || new Color(255, 0, 255)
     this.isSolid = isSolid || false
     this.isWater = isWater || false
 

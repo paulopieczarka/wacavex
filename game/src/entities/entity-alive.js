@@ -15,9 +15,9 @@ class EntityAlive extends Entity {
     this.y += this.velocity * Math.sin(this.rotation)
 
     if (this.velocity > 0) {
-      this.moveBackward(0.005)
+      this.velocity = Math.max(this.velocity - 0.005, 0)
     } else if (this.velocity < 0) {
-      this.moveForward(.005)
+      this.velocity = Math.min(this.velocity + 0.005, 0)
     }
   }
 

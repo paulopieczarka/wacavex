@@ -1,7 +1,8 @@
-import WorldGenerator from "./world-generator"
-import Player from "../entities/player"
+import WorldGenerator from './world-generator'
+import Player from '../entities/player'
+import Camera from '../camera'
 
-const TILE_SIZE = 16
+const TILE_SIZE = 32
 
 class World {
   constructor ({ name, size }) {
@@ -9,8 +10,12 @@ class World {
     this.size = size || 512
     this.generated = false
     this.tiles = []
+    this.depth = []
     this.entities = []
-    this.player = new Player({ x: 0, y: 0 })
+
+    // Create player at world middle
+    const center = (this.size * TILE_SIZE) / 2
+    this.player = new Player({ x: center, y: center })
 
     // Generate world
     this.generate()
@@ -20,8 +25,10 @@ class World {
     // Start tiles matrix
     for (let i=0; i < this.size; i++) {
       this.tiles[i] = []
+      this.depth[i] = []
       for (let j=0; j < this.size; j++) {
         this.tiles[i][j] = 0
+        this.depth[i][j] = 0
       }
     }
 
@@ -40,12 +47,14 @@ class World {
     }
 
     const { size, tiles, entities } = this
-    const maxTileH = Math.min(Math.floor(canvas.width / TILE_SIZE) + 2, size)
-    const maxTileV = Math.min(Math.floor(canvas.height / TILE_SIZE) + 2, size)
+    const xStartIndex = Math.max(Math.floor((Camera.x * (-1)) / TILE_SIZE), 0)
+    const yStartIndex = Math.max(Math.floor((Camera.y * (-1)) / TILE_SIZE), 0)
+    const xEndIndex = Math.min(xStartIndex + Math.floor(canvas.width / TILE_SIZE) + 2, size)
+    const yEndIndex = Math.min(yStartIndex + Math.floor(canvas.height / TILE_SIZE) + 2, size)
 
-    for (let i=0; i < maxTileH; i++) {
-      for (let j=0; j < maxTileV; j++) {
-        g.rect(tileRect(tiles[i][j], i, j))
+    for (let i=xStartIndex; i < xEndIndex; i++) {
+      for (let j=yStartIndex; j < yEndIndex; j++) {
+        g.rect(tileRect(tiles[i][j], i, j, this.depth[i][j]))
       }
     }
 
@@ -70,13 +79,14 @@ class World {
   }
 }
 
-function tileRect (tile, i, j) {
+function tileRect (tile, i, j, depth = 0) {
+  const alpha = 1 - depth
   return ({
-    x: i * TILE_SIZE,
-    y: j * TILE_SIZE,
-    width: TILE_SIZE - 1,
-    height: TILE_SIZE - 1,
-    style: tile.color
+    x: Math.floor((i * TILE_SIZE) + Camera.x),
+    y: Math.floor((j * TILE_SIZE) + Camera.y),
+    width: TILE_SIZE,
+    height: TILE_SIZE,
+    style: tile.color.get(alpha)
   })
 }
 

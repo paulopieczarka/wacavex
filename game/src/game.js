@@ -1,6 +1,6 @@
-import { Graphics, Keyboard } from "./util"
-import World from "./world"
-
+import { Graphics, Keyboard } from './util'
+import World from './world'
+import Camera from './camera'
 
 class Game {
   constructor () {
@@ -27,7 +27,6 @@ class Game {
     // Game components
     this.world = new World({ name: 'New World' })
 
-    this.tr = 0
     this._gameLoop()
   }
 
@@ -37,18 +36,17 @@ class Game {
 
     this.world.render(g, this.canvas)
 
-    g.rect({ x: width/2-25, y: height/2-25, width: 50, height: 50, style: 'red', rotation: this.tr })
     g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
-
-    const { tiles, entities, ...worldProps } = this.world
-    g.text({ x: 10, y: 35, text: `World: ${JSON.stringify(worldProps)}` })
-    g.text({ x: 10, y: 55, text: `Entities: ${entities.length}` })
+    const { tiles, entities, player, depth, ...worldProps } = this.world
+    g.text({ x: 10, y: 35, text: `Camera: ${Camera.x}, ${Camera.y}` })
+    g.text({ x: 10, y: 60, text: `World: ${JSON.stringify(worldProps)}` })
+    g.text({ x: 10, y: 85, text: `Entities: ${entities.length}` })
   }
 
   update (keyboard, delta = 1.0) {
-    this.tr += .02 * delta
-
     this.world.update(keyboard, delta)
+    Camera.follow(this.world.player)
+    Camera.update(keyboard, this.canvas, delta)
   }
 
   _gameLoop () {
