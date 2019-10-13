@@ -24,5 +24,8 @@
         "@babel/plugin-proposal-class-properties"
       ]
     ]
+  },
+  "dependencies": {
+    "p5": "^0.9.0"
   }
 }

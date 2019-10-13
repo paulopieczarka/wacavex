@@ -1,4 +1,5 @@
 import Tile from './tile'
+import { Noise } from '../util'
 
 class WorldGenerator {
   constructor (world) {
@@ -7,9 +8,8 @@ class WorldGenerator {
 
   async generate () {
     await generateWater(this.world)
-    await generateLand(this.world)
-    await generateSand(this.world)
-    await processDepth(this.world)
+    await generateTerrain(this.world)
+    await processRegions(this.world)
 
     return Promise.resolve(true)
   }
@@ -23,63 +23,41 @@ async function generateWater (world) {
   }
 }
 
-async function generateLand (world) {
+async function generateTerrain (world) {
   const { size } = world
 
-  const randomFillPercent = 0.24
-  const map = Array(size)
-  
-  // Random fill map
-  for (let i=0; i < size; i++) {
-    map[i] = Array(size)
-    for (let j=0; j < size; j++) {
-      if (i === 0 || i === size-1 || j === 0 || i === size-1) {
-        map[i][j] = 1
+  const noiseScale = 30
+  const octaves = 6
+  const persistance = 0.5
+  const lacunarity = 2
+
+  const noiseMap = Noise.generateNoiseMap(size, size, noiseScale, octaves, persistance, lacunarity)
+
+  for (let i=0; i < world.size; i++) {
+    for (let j=0; j < world.size; j++) {
+      world.depth[i][j] = Math.min(.3 - (noiseMap[i][j] * noiseMap[i][j] / 2), .3)
+      if (noiseMap[i][j] < .6) {
+        world.setTile(i, j, Tile.SaltWater)
+        
+      } else if (noiseMap[i][j] < .65) {
+        world.setTile(i, j, Tile.Sand)
+      } else if (noiseMap[i][j] > .92) {
+        world.setTile(i, j, Tile.Ice)
       } else {
-        map[i][j] = (Math.random() < randomFillPercent) ? 1 : 0
+        world.setTile(i, j, Tile.Grass)
       }
     }
   }
+}
 
-  // Smooth map
-  function isInMapRange (x, y) {
-    if (x >= 0 && x < size) {
-      if (y >= 0 && y < size) {
-        return true
-      }
-    }
+async function processRegions (world) {
+  const { size } = world
 
-    return false
-  }
-
-  function getSurroundLandCount (x, y) {
-    let landCount = 0
-    for (let xNeighbour=x-1; xNeighbour <= x+1; xNeighbour++) {
-      for (let yNeighbour=y-1; yNeighbour <= y+1; yNeighbour++) {
-        if (xNeighbour !== x || yNeighbour !== y) {
-          if (isInMapRange(xNeighbour, yNeighbour)) {
-            landCount += map[xNeighbour][yNeighbour]
-          }
-        } else {
-          landCount += 1
-        }
-      }
-    }
-
-    return landCount
-  }
-
-  for (let k=0; k < 5; k++) {
-    for (let i=0; i < size; i++) {
-      for (let j=0; j < size; j++) {
-        const neighbourLandTiles = getSurroundLandCount(i, j)
-
-        if (neighbourLandTiles > 4) {
-          map[i][j] = 1
-        } else if (neighbourLandTiles < 4) {
-          map[i][j] = 0
-        }
-      }
+  const map = []
+  for (let i=0; i < world.size; i++) {
+    map[i] = []
+    for (let j=0; j < world.size; j++) {
+      map[i][j] = world.getTile(i, j) === Tile.SaltWater ? 0 : 1
     }
   }
 
@@ -99,7 +77,7 @@ async function generateLand (world) {
 
       for (let i=tile.x-1; i <= tile.x+1; i++) {
         for (let j=tile.y-1; j <= tile.y+1; j++) {
-          if (isInMapRange(i, j) && (j == tile.y || i == tile.x)) {
+          if (i >= 0 && i < size && j >= 0 && j < size && (j == tile.y || i == tile.x)) {
             if (mapFlags[i][j] === 0 && map[i][j] === tileType) {
               mapFlags[i][j] = 1
               queue.unshift({ x: i, y: j })
@@ -132,70 +110,11 @@ async function generateLand (world) {
   }
 
   const regions = getRegions(1)
-  const landThresholdSize = 100
-  regions.forEach(region => {
-    if (region.length < landThresholdSize) {
-      region.forEach(({ x, y }) => map[x][y] = 0)
+  regions.forEach((region) => {
+    if ((region.length < 200 || region.length > 1000) && Math.random() > 0.001) {
+      region.forEach(({ x, y }) => world.setTile(x, y, Tile.SaltWater))
     }
   })
-
-  // Set world tiles
-  for (let i=0; i < size; i++) {
-    for (let j=0; j < size; j++) {
-      if (map[i][j] === 1) {
-        world.setTile(i, j, Tile.Grass)
-      }
-    }
-  }
-}
-
-async function generateSand (world) {
-  const { size } = world
-
-  for (let i=0; i < size; i++) {
-    for (let j=0; j < size; j++) {
-      if (world.getTile(i, j) !== Tile.SaltWater) {
-        for (let x=i-1; x <= i+1; x++) {
-          for (let y=j-1; y <= j+1; y++) {
-            if (x >= 0 && x < size && y >= 0 && y < size) {
-              if (world.getTile(x, y) === Tile.SaltWater) {
-                world.setTile(i, j, Tile.Sand)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-async function processDepth (world) {
-  const { size } = world
-
-  for (let k=0; k < 3; k++) {
-    for (let i=0; i < size; i++) {
-      for (let j=0; j < size; j++) {
-        if (world.getTile(i, j) === Tile.SaltWater) {
-          let depth = 0
-          for (let x=i-1; x <= i+1; x++) {
-            for (let y=j-1; y <= j+1; y++) {
-              if (x >= 0 && x < size && y >= 0 && y < size) {
-                if (world.getTile(x, y) === Tile.Sand) {
-                  depth += .00025
-                }
-                
-                if (x !== i && y !== i) {
-                  depth += world.depth[x][y] / 3
-                }
-              }
-            }
-          }
-  
-          world.depth[i][j] = Math.min(depth, .3)
-        }
-      }
-    }
-  }
 }
 
 export default WorldGenerator

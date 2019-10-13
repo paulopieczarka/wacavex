@@ -5,6 +5,7 @@ class Tile {
   static SaltWater = new Tile(0, 'Salt Water', Color.fromHex('#5199FF'), { isWater: true })
   static Grass = new Tile(1, 'Grass', Color.fromHex('#00FF00'))
   static Sand = new Tile(2, 'Sand', Color.fromHex('#FFFF00'))
+  static Ice = new Tile(3, 'Ice', Color.fromHex('#FFFFFF'))
 
   constructor (id, name, color, { isSolid, isWater } = {}) {
     this.id = id
