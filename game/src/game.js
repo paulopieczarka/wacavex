@@ -44,11 +44,10 @@ class Game {
 
     this.world.render(g, canvas)
 
+    const { entities } = this.world
     g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
-    const { tiles, entities, player, depth, ...worldProps } = this.world
-    g.text({ x: 10, y: 35, text: `Camera: ${Camera.x}, ${Camera.y}` })
-    g.text({ x: 10, y: 60, text: `World: ${JSON.stringify(worldProps)}` })
-    g.text({ x: 10, y: 85, text: `Entities: ${entities.length}` })
+    g.text({ x: 10, y: 35, text: `Camera: ${Math.floor(Camera.x)}, ${Math.floor(Camera.y)}` })
+    g.text({ x: 10, y: 60, text: `Entities: ${entities.length}` })
   }
 
   update (keyboard, canvas, delta = 1.0) {
