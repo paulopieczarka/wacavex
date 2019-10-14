@@ -21,10 +21,11 @@ class Game {
       throw new Error('Could not init 2D context!')
     }
 
-    this.ctx.imageSmoothingEnabled = false
+    this.ctx.imageSmoothingEnabled = true
 
     // Assets
     Assets.add('boat', 'assets/boat.png')
+    Assets.add('caravel', 'assets/caravel.png')
     await Assets.load()
 
     // Handlers
