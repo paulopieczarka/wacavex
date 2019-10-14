@@ -21,6 +21,8 @@ class Game {
       throw new Error('Could not init 2D context!')
     }
 
+    this.ctx.imageSmoothingEnabled = false
+
     // Assets
     Assets.add('boat', 'assets/boat.png')
     await Assets.load()
@@ -35,11 +37,11 @@ class Game {
     this._gameLoop()
   }
 
-  render (g) {
-    const { width, height } = this.canvas
+  render (g, canvas) {
+    const { width, height } = canvas
     this.ctx.clearRect(0, 0, width, height)
 
-    this.world.render(g, this.canvas)
+    this.world.render(g, canvas)
 
     g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
     const { tiles, entities, player, depth, ...worldProps } = this.world
@@ -48,26 +50,37 @@ class Game {
     g.text({ x: 10, y: 85, text: `Entities: ${entities.length}` })
   }
 
-  update (keyboard, delta = 1.0) {
-    this.world.update(keyboard, delta)
+  update (keyboard, canvas, delta = 1.0) {
+    this.world.update(keyboard, canvas, delta)
+
     Camera.follow(this.world.player)
-    Camera.update(keyboard, this.canvas, delta)
+    Camera.update(keyboard, canvas, delta)
   }
 
   _gameLoop () {
-    requestAnimationFrame(() => this._gameLoop())
-    
-    this.update(this.keyboard)
-    this.render(this.g)
+    let frames = 0
+    let lastLoopTime = undefined
+    let lastFpsUpdate = 0
 
-    this.keyboard.poll()
+    const loop = (timestamp) => {
+      requestAnimationFrame(loop)
 
-    this.fpsCounter++
-    if (this.lastUpdate+1000 <= +(new Date())) {
-      this.fps = this.fpsCounter
-      this.fpsCounter = 0
-      this.lastUpdate = +(new Date())
+      const delta = ((timestamp - lastLoopTime) * 0.001) || 1.0
+      lastLoopTime = timestamp
+
+      frames++
+      if ((timestamp - lastFpsUpdate) >= 1000) {
+        lastFpsUpdate = timestamp
+        this.fps = frames
+        frames = 0
+      }
+
+      this.keyboard.poll()
+      this.update(this.keyboard, this.canvas, delta)
+      this.render(this.g, this.canvas)
     }
+
+    requestAnimationFrame(loop)
   }
 }
 

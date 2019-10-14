@@ -78,8 +78,8 @@ class World {
 
     g.ctx.drawImage(
       this.offscreenCanvas,
-      -Camera.x,
-      -Camera.y,
+      -Math.round(Camera.x),
+      -Math.round(Camera.y),
       canvas.width,
       canvas.height,
       0,
@@ -103,21 +103,10 @@ class World {
     this.entities.push(entity)
   }
 
-  update (keyboard, delta) {
+  update (keyboard, canvas, delta) {
     const { entities } = this
-    entities.forEach((entity) => entity.update(keyboard, delta))
+    entities.forEach((entity) => entity.update(keyboard, canvas, delta))
   }
-}
-
-function tileRect (tile, i, j, depth = 0) {
-  const alpha = 1 - depth
-  return ({
-    x: Math.floor((i * TILE_SIZE) + Camera.x),
-    y: Math.floor((j * TILE_SIZE) + Camera.y),
-    width: TILE_SIZE,
-    height: TILE_SIZE,
-    style: tile.color.get(alpha)
-  })
 }
 
 export default World

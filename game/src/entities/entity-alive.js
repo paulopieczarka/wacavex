@@ -8,16 +8,16 @@ class EntityAlive extends Entity {
   }
 
   // @Override
-  update (keyboard, delta) {
-    super.update(keyboard, delta)
+  update (keyboard, canvas, delta) {
+    super.update(keyboard, canvas, delta)
 
-    this.x += this.velocity * Math.cos(this.rotation)
-    this.y += this.velocity * Math.sin(this.rotation)
+    this.x += this.velocity * Math.cos(this.rotation) * delta
+    this.y += this.velocity * Math.sin(this.rotation) * delta
 
     if (this.velocity > 0) {
-      this.velocity = Math.max(this.velocity - 0.005, 0)
+      this.velocity = Math.max(this.velocity - 15.0 * delta, 0)
     } else if (this.velocity < 0) {
-      this.velocity = Math.min(this.velocity + 0.005, 0)
+      this.velocity = Math.min(this.velocity + 15.0 * delta, 0)
     }
   }
 

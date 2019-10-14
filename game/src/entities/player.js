@@ -16,29 +16,29 @@ class Player extends EntityAlive {
   }
 
   // @Override
-  update (keyboard, delta) {
-    super.update(keyboard, delta)
+  update (keyboard, canvas, delta) {
+    super.update(keyboard, canvas, delta)
 
     if (keyboard.isKeyDown('w')) {
-      this.moveForward(0.05)
+      this.moveForward(25.0 * delta)
     }
 
     if (keyboard.isKeyDown('s')) {
-      this.moveBackward(0.05)
+      this.moveBackward(25.0 * delta)
     }
 
     if (keyboard.isKeyDown('a')) {
-      this.rotation -= .1
+      this.rotation -= 2.0 * delta
     }
 
     if (keyboard.isKeyDown('d')) {
-      this.rotation += .1
+      this.rotation += 2.0 * delta
     }
   }
 
   // @Override
   maxSpeed () {
-    return 3.7
+    return 150.0
   }  
 }
 
