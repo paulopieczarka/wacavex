@@ -1,7 +1,7 @@
-import EntityAlive from './entity-alive'
 import Assets from '../assets'
+import EntityBoat from './entity-boat'
 
-class Player extends EntityAlive {
+class Player extends EntityBoat {
   constructor ({ x, y }) {
     super({
       x: x || 0,
@@ -20,11 +20,11 @@ class Player extends EntityAlive {
     super.update(keyboard, canvas, delta)
 
     if (keyboard.isKeyDown('w')) {
-      this.moveForward(25.0 * delta)
+      this.accelerate(delta)
     }
 
     if (keyboard.isKeyDown('s')) {
-      this.moveBackward(25.0 * delta)
+      //this.moveBackward(25.0 * delta)
     }
 
     if (keyboard.isKeyDown('a')) {
@@ -34,11 +34,6 @@ class Player extends EntityAlive {
     if (keyboard.isKeyDown('d')) {
       this.rotation += 2.0 * delta
     }
-  }
-
-  // @Override
-  maxSpeed () {
-    return 150.0
   }  
 }
 

@@ -100,6 +100,7 @@ class World {
   }
 
   spawn (entity) {
+    entity.setWorld(this)
     this.entities.push(entity)
   }
 

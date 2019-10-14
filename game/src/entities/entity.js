@@ -11,6 +11,7 @@ class Entity {
     this.scale = 1.0
     this.color = color || 'orange'
     this.sprite = undefined
+    this.world = undefined
   }
 
   render (g, canvas) {
@@ -45,6 +46,16 @@ class Entity {
 
   isAlive () {
     return false
+  }
+
+  setWorld (world) {
+    this.world = world
+  }
+
+  getFloorTile () {
+    const tileX = Math.floor(this.x / 32)
+    const tileY = Math.floor(this.y / 32)
+    return this.world.getTile(tileX, tileY)
   }
 }
 
