@@ -7,18 +7,19 @@ function onWindowResize (canvas) {
   }
 }
 
-function gameComponent () {
-  const canvas = document.createElement('canvas')
+async function gameComponent () {
+  const canvas = document.getElementById('main-canvas')
   canvas.width = window.innerWidth || 800
   canvas.height = window.innerHeight || 600
   canvas.style.backgroundColor = 'black'
+  canvas.style.transform = 'translateZ(0)'
 
   window.addEventListener('resize', onWindowResize(canvas))
 
   const game = new Game()
-  game.init(canvas)
+  await game.init(canvas)
 
-  return canvas;
+  return canvas
 }
 
-document.body.appendChild(gameComponent())
+window.addEventListener('load', gameComponent, false);

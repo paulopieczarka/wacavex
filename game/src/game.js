@@ -1,6 +1,7 @@
 import { Graphics, Keyboard } from './util'
 import World from './world'
 import Camera from './camera'
+import Assets from './assets'
 
 class Game {
   constructor () {
@@ -13,12 +14,16 @@ class Game {
     this.keyboard = undefined
   }
 
-  init (canvas) {
+  async init (canvas) {
     this.canvas = canvas
-    this.ctx = canvas.getContext('2d')
+    this.ctx = canvas.getContext('2d', { alpha: false })
     if (!this.ctx) {
       throw new Error('Could not init 2D context!')
     }
+
+    // Assets
+    Assets.add('boat', 'assets/boat.png')
+    await Assets.load()
 
     // Handlers
     this.keyboard = new Keyboard()
@@ -50,11 +55,12 @@ class Game {
   }
 
   _gameLoop () {
+    requestAnimationFrame(() => this._gameLoop())
+    
     this.update(this.keyboard)
     this.render(this.g)
 
     this.keyboard.poll()
-    window.requestAnimationFrame(() => this._gameLoop())
 
     this.fpsCounter++
     if (this.lastUpdate+1000 <= +(new Date())) {

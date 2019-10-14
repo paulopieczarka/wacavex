@@ -1,4 +1,5 @@
 import EntityAlive from './entity-alive'
+import Assets from '../assets'
 
 class Player extends EntityAlive {
   constructor ({ x, y }) {
@@ -10,6 +11,8 @@ class Player extends EntityAlive {
       height: 16,
       color: 'orange'
     })
+
+    this.sprite = Assets.get('boat')
   }
 
   // @Override
