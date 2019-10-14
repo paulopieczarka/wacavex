@@ -36,8 +36,38 @@ class World {
     const generator = new WorldGenerator(this)
     await generator.generate()
 
+    this.__renderOffscren()
+
     this.spawn(this.player)
     this.generated = true
+  }
+
+  __renderOffscren () {
+    const { size } = this
+    const width = size * TILE_SIZE
+    const height = size * TILE_SIZE
+
+    if (window.OffscreenCanvas) {
+      this.offscreenCanvas = new OffscreenCanvas(width, height)
+    } else {
+      console.warn('OffscreenCanvas not supported!')
+      this.offscreenCanvas = document.createElement('canvas')
+      this.offscreenCanvas.width = width
+      this.offscreenCanvas.height = height
+    }
+
+    const ctx = this.offscreenCanvas.getContext('2d')
+
+    for (let i=0; i < size; i++) {
+      for (let j=0; j < size; j++) {
+        const tile = this.tiles[i][j]
+        const depth = this.depth[i][j]
+        const x = i * TILE_SIZE
+        const y = j * TILE_SIZE
+        ctx.fillStyle = tile.color.get(1 - depth)
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
+      }
+    }
   }
 
   render (g, canvas) {
@@ -46,19 +76,19 @@ class World {
       return
     }
 
-    const { size, tiles, entities } = this
-    const xStartIndex = Math.max(Math.floor((Camera.x * (-1)) / TILE_SIZE), 0)
-    const yStartIndex = Math.max(Math.floor((Camera.y * (-1)) / TILE_SIZE), 0)
-    const xEndIndex = Math.min(xStartIndex + Math.floor(canvas.width / TILE_SIZE) + 2, size)
-    const yEndIndex = Math.min(yStartIndex + Math.floor(canvas.height / TILE_SIZE) + 2, size)
+    g.ctx.drawImage(
+      this.offscreenCanvas,
+      -Camera.x,
+      -Camera.y,
+      canvas.width,
+      canvas.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    )
 
-    for (let i=xStartIndex; i < xEndIndex; i++) {
-      for (let j=yStartIndex; j < yEndIndex; j++) {
-        g.rect(tileRect(tiles[i][j], i, j, this.depth[i][j]))
-      }
-    }
-
-    entities.forEach((entity) => entity.render(g, canvas))
+    this.entities.forEach((entity) => entity.render(g, canvas))
   }
 
   setTile (x, y, tile) {
