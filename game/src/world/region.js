@@ -41,7 +41,6 @@ class Region {
     const points = this.tiles.map(({ x, y }) => [x, y])
     const concaveHull = hull(points, 50)
     this.shape = concaveHull.map(([x, y]) => [x * 32, y * 32])
-    console.log(this.tiles.length, '=>',this.shape.length)
   }
 }
 

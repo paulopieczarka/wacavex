@@ -64,10 +64,18 @@ class World {
       for (let j=0; j < size; j++) {
         const tile = this.tiles[i][j]
         const depth = this.depth[i][j]
-        const x = i * TILE_SIZE
-        const y = j * TILE_SIZE
+        const x = Math.floor(i * TILE_SIZE)
+        const y = Math.floor(j * TILE_SIZE)
         ctx.fillStyle = tile.color.get(1 - depth)
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
+
+        if (!this.tiles[i][j].isWater) {
+          if (j < (size - 1) && this.tiles[i][j+1].id !== this.tiles[i][j].id) {
+            ctx.fillStyle = 'rgba(0, 0, 0, .1)'
+            ctx.fillRect(x, y+TILE_SIZE-TILE_SIZE/10, TILE_SIZE, TILE_SIZE/10)
+          }
+        }
+        
       }
     }
   }
