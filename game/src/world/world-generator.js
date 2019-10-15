@@ -38,9 +38,16 @@ async function generateTerrain (world) {
       world.depth[i][j] = Math.min(.3 - (noiseMap[i][j] * noiseMap[i][j] / 2), .3)
       if (noiseMap[i][j] < .6) {
         world.setTile(i, j, Tile.SaltWater)
-        
       } else if (noiseMap[i][j] < .65) {
         world.setTile(i, j, Tile.Sand)
+      } else if (noiseMap[i][j] > .72 && noiseMap[i][j] < .82) {
+        world.setTile(i, j, Tile.Tree)
+      } else if (noiseMap[i][j] > .81 && noiseMap[i][j] < .92) {
+        if (Math.random() > .9) {
+          world.setTile(i, j, Tile.Iron)
+        } else {
+          world.setTile(i, j, Tile.Stone)
+        }
       } else if (noiseMap[i][j] > .92) {
         world.setTile(i, j, Tile.Ice)
       } else {

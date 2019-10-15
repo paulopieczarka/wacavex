@@ -70,7 +70,7 @@ class World {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
 
         if (!this.tiles[i][j].isWater) {
-          if (j < (size - 1) && this.tiles[i][j+1].id !== this.tiles[i][j].id) {
+          if (j < (size - 1) && this.tiles[i][j]['elevation'] > this.tiles[i][j+1]['elevation']) {
             ctx.fillStyle = 'rgba(0, 0, 0, .1)'
             ctx.fillRect(x, y+TILE_SIZE-TILE_SIZE/10, TILE_SIZE, TILE_SIZE/10)
           }
