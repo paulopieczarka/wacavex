@@ -1,6 +1,7 @@
 import WorldGenerator from './world-generator'
 import Player from '../entities/player'
 import Camera from '../camera'
+import Region from './region'
 
 const TILE_SIZE = 32
 
@@ -12,6 +13,7 @@ class World {
     this.tiles = []
     this.depth = []
     this.entities = []
+    this.regions = []
 
     // Create player at world middle
     const center = (this.size * TILE_SIZE) / 2
@@ -72,7 +74,7 @@ class World {
 
   render (g, canvas) {
     if (!this.generated) {
-      g.text({ x: 0, y: 0, text: 'Generating world!!' })
+      g.text({ x: 300, y: 300, text: 'Generating world!!' })
       return
     }
 
@@ -88,6 +90,8 @@ class World {
       canvas.height
     )
 
+    this.regions.forEach((region) => region.render(g, canvas))
+
     this.entities.forEach((entity) => entity.render(g, canvas))
   }
 
@@ -97,6 +101,12 @@ class World {
 
   getTile (x, y) {
     return this.tiles[x][y]
+  }
+
+  setRegions (regionsTiles) {
+    this.regions = (
+      regionsTiles.map(tiles => new Region({ tiles, world: this }))
+    )
   }
 
   spawn (entity) {

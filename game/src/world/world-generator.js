@@ -110,11 +110,14 @@ async function processRegions (world) {
   }
 
   const regions = getRegions(1)
-  regions.forEach((region) => {
-    if ((region.length < 200 || region.length > 1000) && Math.random() > 0.001) {
+  regions.forEach((region, i) => {
+    if ((region.length < 200 || region.length > 1000) && Math.random() > 0.0001) {
       region.forEach(({ x, y }) => world.setTile(x, y, Tile.SaltWater))
+      regions.splice(i, 1)
     }
   })
+
+  world.setRegions(regions)
 }
 
 export default WorldGenerator
