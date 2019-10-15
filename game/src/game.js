@@ -46,10 +46,10 @@ class Game {
 
     this.world.render(g, canvas)
 
-    // const { entities, regions } = this.world
-    // g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
-    // g.text({ x: 10, y: 35, text: `Camera: ${Math.floor(Camera.x)}, ${Math.floor(Camera.y)}` })
-    // g.text({ x: 10, y: 60, text: `Regions: ${regions.length} // Entities: ${entities.length}` })
+    const { entities, regions } = this.world
+    g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
+    g.text({ x: 10, y: 35, text: `Camera: ${Math.floor(Camera.x)}, ${Math.floor(Camera.y)}` })
+    g.text({ x: 10, y: 60, text: `Regions: ${regions.length} // Entities: ${entities.length}` })
   }
 
   update (keyboard, canvas, delta = 1.0) {
@@ -77,9 +77,9 @@ class Game {
         frames = 0
       }
 
-      this.keyboard.poll()
       this.update(this.keyboard, this.canvas, delta)
       this.render(this.g, this.canvas)
+      this.keyboard.poll()
     }
 
     requestAnimationFrame(loop)

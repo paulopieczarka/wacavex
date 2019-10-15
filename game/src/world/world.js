@@ -2,8 +2,7 @@ import WorldGenerator from './world-generator'
 import Player from '../entities/player'
 import Camera from '../camera'
 import Region from './region'
-
-const TILE_SIZE = 32
+import { TILE_SIZE, TILE_ELEVATION_SIZE } from '../constants'
 
 class World {
   constructor ({ name, size }) {
@@ -72,7 +71,7 @@ class World {
         if (!this.tiles[i][j].isWater) {
           if (j < (size - 1) && this.tiles[i][j]['elevation'] > this.tiles[i][j+1]['elevation']) {
             ctx.fillStyle = 'rgba(0, 0, 0, .1)'
-            ctx.fillRect(x, y+TILE_SIZE-TILE_SIZE/10, TILE_SIZE, TILE_SIZE/10)
+            ctx.fillRect(x, y+TILE_SIZE-TILE_ELEVATION_SIZE, TILE_SIZE, TILE_ELEVATION_SIZE)
           }
         }
         
@@ -124,7 +123,12 @@ class World {
 
   update (keyboard, canvas, delta) {
     const { entities } = this
-    entities.forEach((entity) => entity.update(keyboard, canvas, delta))
+    entities.forEach((entity, i) => {
+      entity.update(keyboard, canvas, delta)
+      if (entity._destroy) {
+        entities.splice(i, 1)
+      }
+    })
   }
 }
 

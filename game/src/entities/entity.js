@@ -1,4 +1,5 @@
 import Camera from '../camera'
+import { TILE_SIZE } from '../constants'
 
 class Entity {
   constructor ({ name, x, y, width, height, color }) {
@@ -12,6 +13,7 @@ class Entity {
     this.color = color || 'orange'
     this.sprite = undefined
     this.world = undefined
+    this._destroy = false
   }
 
   render (g, canvas) {
@@ -53,9 +55,19 @@ class Entity {
   }
 
   getFloorTile () {
-    const tileX = Math.floor(this.x / 32)
-    const tileY = Math.floor(this.y / 32)
-    return this.world.getTile(tileX, tileY)
+    return this.world.getTile(this.tilePosX, this.tilePosY)
+  }
+
+  get tilePosX () {
+    return Math.floor(this.x / TILE_SIZE)
+  }
+
+  get tilePosY () {
+    return Math.floor(this.y / TILE_SIZE)
+  }
+
+  destroy () {
+    this._destroy = true
   }
 }
 

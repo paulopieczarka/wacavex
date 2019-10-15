@@ -1,5 +1,6 @@
 import Camera from '../camera'
 import { hull } from '../util'
+import { TILE_SIZE } from '../constants'
 
 class Region {
   constructor ({ name, tiles, world } = {}) {
@@ -40,7 +41,7 @@ class Region {
   _calcRegionShape () {
     const points = this.tiles.map(({ x, y }) => [x, y])
     const concaveHull = hull(points, 50)
-    this.shape = concaveHull.map(([x, y]) => [x * 32, y * 32])
+    this.shape = concaveHull.map(([x, y]) => [x * TILE_SIZE, y * TILE_SIZE])
   }
 }
 
