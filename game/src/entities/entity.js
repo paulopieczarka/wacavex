@@ -27,7 +27,7 @@ class Entity {
     } else {
       g.ctx.translate(this.posX, this.posY)
       g.ctx.rotate(this.rotation)
-      g.ctx.drawImage(this.sprite, -this.sprite.width/2, -this.sprite.height/2, this.width, this.height)
+      g.ctx.drawImage(this.sprite, -this.width/2, -this.height/2, this.width, this.height)
       g.ctx.rotate(-this.rotation)
       g.ctx.translate(-this.posX, -this.posY)
 

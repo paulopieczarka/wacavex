@@ -22,10 +22,12 @@ class Game {
     }
 
     this.ctx.imageSmoothingEnabled = true
+    this.ctx.imageSmoothingQuality = 'high'
 
     // Assets
     Assets.add('boat', 'assets/boat.png')
     Assets.add('caravel', 'assets/caravel.png')
+    Assets.add('boat_v2', 'assets/boat_v2.png')
     await Assets.load()
 
     // Handlers
@@ -44,10 +46,10 @@ class Game {
 
     this.world.render(g, canvas)
 
-    const { entities, regions } = this.world
-    g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
-    g.text({ x: 10, y: 35, text: `Camera: ${Math.floor(Camera.x)}, ${Math.floor(Camera.y)}` })
-    g.text({ x: 10, y: 60, text: `Regions: ${regions.length} // Entities: ${entities.length}` })
+    // const { entities, regions } = this.world
+    // g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
+    // g.text({ x: 10, y: 35, text: `Camera: ${Math.floor(Camera.x)}, ${Math.floor(Camera.y)}` })
+    // g.text({ x: 10, y: 60, text: `Regions: ${regions.length} // Entities: ${entities.length}` })
   }
 
   update (keyboard, canvas, delta = 1.0) {

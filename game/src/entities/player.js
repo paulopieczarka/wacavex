@@ -8,11 +8,11 @@ class Player extends EntityBoat {
       y: x || 0,
       name: 'Player',
       width: 32,
-      height: 16,
+      height: 32,
       color: 'orange'
     })
 
-    this.sprite = Assets.get('boat')
+    this.sprite = Assets.get('boat_v2')
   }
 
   // @Override
