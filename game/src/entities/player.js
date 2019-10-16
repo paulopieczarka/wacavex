@@ -2,6 +2,9 @@ import Assets from '../assets'
 import EntityBoat from './entity-boat'
 import EntityHuman from './human'
 import { TILE_SIZE, START_CREW_SIZE } from '../constants'
+import ProgressBar from '../gui/progress-bar'
+import GuiManager from '../gui/manager'
+import { ConstraintTop, ConstraintLeft, ConstraintComponentBottom } from '../gui/component'
 
 class Player extends EntityBoat {
   constructor ({ x, y }) {
@@ -18,6 +21,18 @@ class Player extends EntityBoat {
     this.crew = undefined
     this.crewSize = START_CREW_SIZE || 0
     this.visionRadius = 2
+
+    this.healthBar = new ProgressBar(this.health, { label: 'Health', color: 'orangered' })
+    this.healthBar.addConstraint(new ConstraintTop(10))
+    this.healthBar.addConstraint(new ConstraintLeft(10))
+
+    this.fuelBar = new ProgressBar(0, { label: 'Fuel', color: 'cyan' })
+    this.fuelBar.width = 120; this.fuelBar.height = 14
+    this.fuelBar.addConstraint(new ConstraintComponentBottom(10, this.healthBar))
+    this.fuelBar.addConstraint(new ConstraintLeft(10))
+
+    GuiManager.attach(this.healthBar)
+    GuiManager.attach(this.fuelBar)
   }
 
   // @Override

@@ -2,6 +2,8 @@ import { Graphics, Keyboard } from './util'
 import World from './world'
 import Camera from './camera'
 import Assets from './assets'
+import DebugGUI from './gui/debug'
+import GuiManager from './gui/manager'
 
 class Game {
   constructor () {
@@ -37,6 +39,9 @@ class Game {
     // Game components
     this.world = new World({ name: 'New World' })
 
+    // UIs
+    this.debugUI = new DebugGUI(this, this.world)
+
     this._gameLoop()
   }
 
@@ -45,11 +50,9 @@ class Game {
     this.ctx.clearRect(0, 0, width, height)
 
     this.world.render(g, canvas)
+    this.debugUI.render(g, canvas)
 
-    const { entities, regions } = this.world
-    g.text({ x: 10, y: 10, text: `Window: ${width}x${height} (${this.fps} fps)` })
-    g.text({ x: 10, y: 35, text: `Camera: ${Math.floor(Camera.x)}, ${Math.floor(Camera.y)}` })
-    g.text({ x: 10, y: 60, text: `Regions: ${regions.length} // Entities: ${entities.length}` })
+    GuiManager.render(g.ctx, canvas)
   }
 
   update (keyboard, canvas, delta = 1.0) {
@@ -57,6 +60,8 @@ class Game {
 
     Camera.follow(this.world.player)
     Camera.update(keyboard, canvas, delta)
+
+    GuiManager.update(delta)
   }
 
   _gameLoop () {

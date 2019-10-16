@@ -2,7 +2,11 @@ import WorldGenerator from './world-generator'
 import Player from '../entities/player'
 import Camera from '../camera'
 import Region from './region'
-import { TILE_SIZE, TILE_ELEVATION_SIZE } from '../constants'
+import { OffscreenCanvas } from '../util'
+import {
+  TILE_SIZE,
+  TILE_ELEVATION_SIZE
+} from '../constants'
 
 class World {
   constructor ({ name, size }) {
@@ -48,15 +52,7 @@ class World {
     const width = size * TILE_SIZE
     const height = size * TILE_SIZE
 
-    if (window.OffscreenCanvas) {
-      this.offscreenCanvas = new OffscreenCanvas(width, height)
-    } else {
-      console.warn('OffscreenCanvas not supported!')
-      this.offscreenCanvas = document.createElement('canvas')
-      this.offscreenCanvas.width = width
-      this.offscreenCanvas.height = height
-    }
-
+    this.offscreenCanvas = OffscreenCanvas.create(width, height)
     const ctx = this.offscreenCanvas.getContext('2d')
 
     for (let i=0; i < size; i++) {
