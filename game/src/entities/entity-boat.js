@@ -18,8 +18,8 @@ class EntityBoat extends Entity {
   }
 
   // @Override
-  update (keyboard, canvas, delta) {
-    super.update(keyboard, canvas, delta)
+  update ({ mouse, keyboard }, canvas, delta) {
+    super.update({ mouse, keyboard }, canvas, delta)
 
     // Move boat
     this.x += this.velocity * Math.cos(this.rotation) * delta

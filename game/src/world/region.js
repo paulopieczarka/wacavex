@@ -18,7 +18,7 @@ class Region {
     }
   }
 
-  update (keyboard, canvas, delta) {
+  update ({ mouse, keyboard }, canvas, delta) {
   }
 
   isOnScreen (canvas) {

@@ -36,7 +36,7 @@ class Entity {
     }
   }
 
-  update (keyboard, canvas, delta) { }
+    update ({ mouse, keyboard }, canvas, delta) { }
 
   get posX () {
     return this.x + Camera.x

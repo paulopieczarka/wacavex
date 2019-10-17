@@ -1,4 +1,4 @@
-import { Graphics, Keyboard } from './util'
+import { Graphics, Keyboard, Mouse } from './util'
 import World from './world'
 import Camera from './camera'
 import Assets from './assets'
@@ -14,6 +14,7 @@ class Game {
     this.ctx = undefined
     this.g = undefined
     this.keyboard = undefined
+    this.mouse = undefined
   }
 
   async init (canvas) {
@@ -33,8 +34,13 @@ class Game {
     await Assets.load()
 
     // Handlers
+    this.mouse = new Mouse()
     this.keyboard = new Keyboard()
     this.g = new Graphics(this.ctx)
+    this.handlers = ({
+      mouse: this.mouse,
+      keyboard: this.keyboard
+    })
 
     // Game components
     this.world = new World({ name: 'New World' })
@@ -55,11 +61,11 @@ class Game {
     GuiManager.render(g.ctx, canvas)
   }
 
-  update (keyboard, canvas, delta = 1.0) {
-    this.world.update(keyboard, canvas, delta)
+  update ({ mouse, keyboard }, canvas, delta = 1.0) {
+    this.world.update({ mouse, keyboard }, canvas, delta)
 
     Camera.follow(this.world.player)
-    Camera.update(keyboard, canvas, delta)
+    Camera.update({ mouse, keyboard }, canvas, delta)
 
     GuiManager.update(delta)
   }
@@ -82,7 +88,7 @@ class Game {
         frames = 0
       }
 
-      this.update(this.keyboard, this.canvas, delta)
+      this.update(this.handlers, this.canvas, delta)
       this.render(this.g, this.canvas)
       this.keyboard.poll()
     }

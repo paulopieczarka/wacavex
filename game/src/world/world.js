@@ -5,7 +5,8 @@ import Region from './region'
 import { OffscreenCanvas } from '../util'
 import {
   TILE_SIZE,
-  TILE_ELEVATION_SIZE
+  TILE_ELEVATION_SIZE,
+  HALF_TILE_SIZE
 } from '../constants'
 
 class World {
@@ -17,6 +18,7 @@ class World {
     this.depth = []
     this.entities = []
     this.regions = []
+    this.mouse = undefined
 
     // Create player at world middle
     const center = (this.size * TILE_SIZE) / 2
@@ -41,38 +43,8 @@ class World {
     const generator = new WorldGenerator(this)
     await generator.generate()
 
-    this.__renderOffscren()
-
     this.spawn(this.player)
     this.generated = true
-  }
-
-  __renderOffscren () {
-    const { size } = this
-    const width = size * TILE_SIZE
-    const height = size * TILE_SIZE
-
-    this.offscreenCanvas = OffscreenCanvas.create(width, height)
-    const ctx = this.offscreenCanvas.getContext('2d')
-
-    for (let i=0; i < size; i++) {
-      for (let j=0; j < size; j++) {
-        const tile = this.tiles[i][j]
-        const depth = this.depth[i][j]
-        const x = Math.floor(i * TILE_SIZE)
-        const y = Math.floor(j * TILE_SIZE)
-        ctx.fillStyle = tile.color.get(1 - depth)
-        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
-
-        if (!this.tiles[i][j].isWater) {
-          if (j < (size - 1) && this.tiles[i][j]['elevation'] > this.tiles[i][j+1]['elevation']) {
-            ctx.fillStyle = 'rgba(0, 0, 0, .1)'
-            ctx.fillRect(x, y+TILE_SIZE-TILE_ELEVATION_SIZE, TILE_SIZE, TILE_ELEVATION_SIZE)
-          }
-        }
-        
-      }
-    }
   }
 
   render (g, canvas) {
@@ -81,21 +53,68 @@ class World {
       return
     }
 
-    g.ctx.drawImage(
-      this.offscreenCanvas,
-      -Math.round(Camera.x),
-      -Math.round(Camera.y),
-      canvas.width,
-      canvas.height,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    )
+    const { size } = this
+    const xStart = Math.max(Math.floor((-Camera.x)/32) - 1, 0)
+    const yStart = Math.max(Math.floor((-Camera.y)/32) - 1, 0)
+    const xEnd = xStart + Math.floor(canvas.width/32) + 4
+    const yEnd = yStart + Math.floor(canvas.height/32) + 4
+
+    let hoverTile = undefined
+    for (let i=xStart; i < xEnd; i++) {
+      for (let j=yStart; j < yEnd; j++) {
+        const tile = this.tiles[i][j]
+        const depth = this.depth[i][j]
+        const x = Math.floor(Camera.x + i * TILE_SIZE)
+        const y = Math.floor(Camera.y + j * TILE_SIZE)
+        g.ctx.fillStyle = tile.color.get(1 - depth)
+        g.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
+
+        if (!this.tiles[i][j].isWater) {
+          if (j < (size - 1) && this.tiles[i][j]['elevation'] > this.tiles[i][j+1]['elevation']) {
+            g.ctx.fillStyle = 'rgba(0, 0, 0, .1)'
+            g.ctx.fillRect(x, y+TILE_SIZE-TILE_ELEVATION_SIZE, TILE_SIZE, TILE_ELEVATION_SIZE)
+          }
+        }
+
+        if (this.mouse) {
+          if (this.mouse.x >= x && this.mouse.x <= x+TILE_SIZE) {
+            if (this.mouse.y >= y && this.mouse.y <= y+TILE_SIZE) {
+              hoverTile = ({ x, y })
+            }
+          }
+        }
+      }
+    }
+
+    if (hoverTile) {
+      g.ctx.strokeStyle = 'rgba(0, 0, 0, .5)'
+      g.ctx.lineWidth = 1
+      g.ctx.beginPath()
+      g.ctx.rect(hoverTile.x, hoverTile.y, TILE_SIZE, TILE_SIZE)
+      g.ctx.stroke()
+    }
 
     this.regions.forEach((region) => region.render(g, canvas))
 
     this.entities.forEach((entity) => entity.render(g, canvas))
+    
+    if (this.mouseTile) {
+      g.ctx.strokeStyle = 'rgba(0, 0, 0, .5)'
+      g.ctx.beginPath()
+      g.ctx.rect(
+        Camera.x + (this.mouseTile.x * 32),
+        Camera.y + (this.mouseTile.y * 32),
+        TILE_SIZE,
+        TILE_SIZE
+      )
+      g.ctx.stroke()
+
+      g.text({
+        x: 300,
+        y: 300,
+        text: `Tile(${this.mouseTile.x},${this.mouseTile.y}) => ${this.mouseTile.tile.name}`
+      })
+    }
   }
 
   setTile (x, y, tile) {
@@ -117,14 +136,16 @@ class World {
     this.entities.push(entity)
   }
 
-  update (keyboard, canvas, delta) {
+  update ({ mouse, keyboard }, canvas, delta) {
     const { entities } = this
     entities.forEach((entity, i) => {
-      entity.update(keyboard, canvas, delta)
+      entity.update({ mouse, keyboard }, canvas, delta)
       if (entity._destroy) {
         entities.splice(i, 1)
       }
     })
+
+    this.mouse = mouse
   }
 }
 

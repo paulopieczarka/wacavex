@@ -36,8 +36,8 @@ class Player extends EntityBoat {
   }
 
   // @Override
-  update (keyboard, canvas, delta) {
-    super.update(keyboard, canvas, delta)
+  update ({ mouse, keyboard }, canvas, delta) {
+    super.update({ mouse, keyboard }, canvas, delta)
 
     if (keyboard.isKeyDown('KeyW')) {
       this.accelerate(delta)
