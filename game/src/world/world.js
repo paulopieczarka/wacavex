@@ -79,18 +79,18 @@ class World {
         if (this.mouse) {
           if (this.mouse.x >= x && this.mouse.x <= x+TILE_SIZE) {
             if (this.mouse.y >= y && this.mouse.y <= y+TILE_SIZE) {
-              hoverTile = ({ x, y })
+              this.mouse['tile'] = ({ x: i, y: j, worldPosX: x, worldPosY: y })
             }
           }
         }
       }
     }
 
-    if (hoverTile) {
+    if (this.mouse && this.mouse['tile']) {
       g.ctx.strokeStyle = 'rgba(0, 0, 0, .5)'
       g.ctx.lineWidth = 1
       g.ctx.beginPath()
-      g.ctx.rect(hoverTile.x, hoverTile.y, TILE_SIZE, TILE_SIZE)
+      g.ctx.rect(this.mouse['tile']['worldPosX'], this.mouse['tile']['worldPosY'], TILE_SIZE, TILE_SIZE)
       g.ctx.stroke()
     }
 
@@ -145,7 +145,15 @@ class World {
       }
     })
 
-    this.mouse = mouse
+    if (this.mouse && this.mouse['tile']) {
+      if (mouse.isButtonPressed(1)) {
+        const { tile: coords } = this.mouse
+        const tile = this.getTile(coords.x, coords.y)
+        console.log('Hit:', tile.name, '=>', tile.resource)
+      }
+    }
+
+    this.mouse = ({ x: mouse.x, y: mouse.y })
   }
 }
 

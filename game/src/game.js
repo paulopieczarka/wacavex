@@ -4,6 +4,8 @@ import Camera from './camera'
 import Assets from './assets'
 import DebugGUI from './gui/debug'
 import GuiManager from './gui/manager'
+import Tile from './world/tile'
+import Item from './world/item'
 
 class Game {
   constructor () {
@@ -91,6 +93,7 @@ class Game {
       this.update(this.handlers, this.canvas, delta)
       this.render(this.g, this.canvas)
       this.keyboard.poll()
+      this.mouse.pool()
     }
 
     requestAnimationFrame(loop)
